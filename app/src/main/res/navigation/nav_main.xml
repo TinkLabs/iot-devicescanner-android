@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            app:startDestination="@+id/main_fragment">
+    <fragment
+            android:id="@+id/main_fragment"
+            android:label="Main"
+            android:name="com.tinklabs.iot.devicescanner.business.index.IndexFragment"
+            tools:layout="@layout/index_layout">
+        <action android:id="@+id/action_to_setting"
+                app:destination="@+id/setting_fragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+        <action
+                android:id="@+id/action_to_single_scan"
+                app:destination="@+id/single_scan_fragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+
+        <action
+                android:id="@+id/action_to_batch_scan"
+                app:destination="@+id/batch_scan_fragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/single_scan_fragment"
+            android:label="SingleScan"
+            android:name="com.tinklabs.iot.devicescanner.business.singlescan.SingleScanFragment"/>
+
+    <fragment
+            android:id="@+id/batch_scan_fragment"
+            android:label="BatchScan"
+            android:name="com.tinklabs.iot.devicescanner.business.batchscan.BatchScanFragment"/>
+
+    <fragment
+            android:id="@+id/setting_fragment"
+            android:label="Setting"
+            android:name="com.tinklabs.iot.devicescanner.business.setting.SettingFragment"/>
+
+</navigation>

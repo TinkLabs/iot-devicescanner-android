@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Tinklabs Device Scanner</string>
+
+    <string name="title_single">Single Scan</string>
+    <string name="title_batch">Batch Scan</string>
+    <string name="title_settings">Settings</string>
+    <string name="click_me">Click Me</string>
+
+    <string name="scan_result_message">IMEI: %s\nS/N: %s</string>
+    <string name="scan_result_batch_message">Devices count: %d</string>
+    <string name="scan_result_title">Scan Result</string>
+
+    <string name="scan_component_tip">Place IMEI and S/N completely inside viewfinder!</string>
+    <string name="cancel">Cancel</string>
+    <string name="upload">Upload</string>
+    <string name="status">Please input the status</string>
+    <string name="title_activity_scan">ScanActivity</string>
+    <string name="scan_page_title">Scan Page</string>
+
+    <string name="server_client_id">594936906978-oo1t93vs014gdhqbs40tr8417s9c547q.apps.googleusercontent.com</string>
+    <string name="setting">Setting</string>
+</resources>

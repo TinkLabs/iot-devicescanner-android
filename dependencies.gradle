@@ -1,0 +1,30 @@
+ext.versions = [
+        versionCode      : 1,
+        versionName      : '1.0.0',
+
+        compileSdkVersion: 28,
+        buildToolsVersion: '28.0.2',
+        targetSdkVersion : '28',
+        minSdkVersion    : '19',
+
+        rxAndroidVersion : '2.1.0',
+        rxJava2Version   : '2.2.4',
+        rxKotlinVersion  : '2.3.0',
+        retrofitVersion  : '2.4.0',
+
+        androidxVersion  : "1.0.0",
+        koin_version     : '1.0.2'
+]
+ext.libraries = [
+        koin                    : "org.koin:koin-android:$versions.koin_version",
+        koinViewModel           : "org.koin:koin-androidx-viewmodel:$versions.koin_version",
+
+        rxKotlin                : "io.reactivex.rxjava2:rxkotlin:$versions.rxKotlinVersion",
+        rxJava2                 : "io.reactivex.rxjava2:rxjava:$versions.rxJava2Version",
+        rxAndroid               : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroidVersion",
+
+        androidxAppCompat       : "androidx.appcompat:appcompat:$versions.androidxVersion",
+        androidxRecyclerView    : "androidx.recyclerview:recyclerview:$versions.androidxVersion",
+        androidxFragment        : "androidx.fragment:fragment:$versions.androidxVersion",
+        androidxConstraintlayout: "androidx.constraintlayout:constraintlayout:1.1.2"
+]

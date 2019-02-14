@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="2dp"
+        app:contentPaddingLeft="16dp"
+        app:contentPaddingRight="0dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:strokeWidth="2dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/item_imei"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:gravity="center_vertical"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/item_sn"
+            android:layout_width="match_parent"
+            android:layout_marginTop="28dp"
+            android:layout_height="28dp"
+            android:gravity="center_vertical"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/removeIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            app:srcCompat="@drawable/ic_close"
+            android:textColor="@color/colorAccent"
+            android:layout_gravity="end|center_vertical"/>
+
+</com.google.android.material.card.MaterialCardView>

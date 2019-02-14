@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sp_key_enable_sound">enable_sound</string>
+    <string name="sp_key_enable_UPCA">enable_UPCA</string>
+    <string name="sp_key_enable_CODE39">enable_CODE39</string>
+    <string name="sp_key_enable_CODE128">enable_CODE128</string>
+    <string name="sp_key_enable_QR">enable_QR</string>
+    <string name="sp_key_enable_EAN13">enable_EAN13</string>
+    <string name="sp_key_feedback">feedback</string>
+    <string name="sp_key_about">about</string>
+    <string name="sp_key_logout">logout</string>
+
+    <bool name="sp_default_enable_sound">true</bool>
+    <bool name="sp_default_enable_UPCA">false</bool>
+    <bool name="sp_default_enable_CODE39">false</bool>
+    <bool name="sp_default_enable_CODE128">true</bool>
+    <bool name="sp_default_enable_QR">false</bool>
+    <bool name="sp_default_enable_EAN13">false</bool>
+</resources>
