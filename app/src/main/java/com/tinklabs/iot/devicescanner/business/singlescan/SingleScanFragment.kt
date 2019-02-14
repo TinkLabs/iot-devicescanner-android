@@ -7,8 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.tinklabs.iot.devicescanner.R
+import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
+import kotlinx.android.synthetic.main.fragment_single_scan.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class SingleScanFragment : Fragment() {
     private val viewModel by viewModel<SingleScanViewModel>()
@@ -18,8 +19,20 @@ class SingleScanFragment : Fragment() {
 
         viewModel.valid.observe(this, Observer {
             if (it) {
-                Timber.d("%s, %s", viewModel.deviceInfo.value?.imei, viewModel.deviceInfo.value?.snCode)
-                viewModel.upload()
+                decodeComponent.enableScanning(false)
+                ConfirmDialog(context!!)
+                    .cancelable(false)
+                    .title("Confirm to Upload?")
+                    .content("IMEI: ${viewModel.deviceInfo.value?.imei}\n S/N: ${viewModel.deviceInfo.value?.snCode}")
+                    .confirmText(R.string.upload)
+                    .onConfirm(View.OnClickListener {
+                        viewModel.upload()
+                        decodeComponent.enableScanning(true)
+                    })
+                    .onCancel(View.OnClickListener {
+                        decodeComponent.enableScanning(true)
+                    })
+                    .show()
             } else {
 
             }
@@ -27,8 +40,7 @@ class SingleScanFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_single_scan, container, false)
-        return view
+        return inflater.inflate(R.layout.fragment_single_scan, container, false)
     }
 
     override fun onResume() {
@@ -44,5 +56,6 @@ class SingleScanFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.onDestroyView()
+        decodeComponent.dispose()
     }
 }

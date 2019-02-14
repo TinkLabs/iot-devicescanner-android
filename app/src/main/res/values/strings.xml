@@ -17,6 +17,15 @@
     <string name="title_activity_scan">ScanActivity</string>
     <string name="scan_page_title">Scan Page</string>
 
-    <string name="server_client_id">594936906978-oo1t93vs014gdhqbs40tr8417s9c547q.apps.googleusercontent.com</string>
+    <string name="server_client_id">594936906978-uv3b24i85sviqjq179v68g3uhgiv2ifb.apps.googleusercontent.com</string>
     <string name="setting">Setting</string>
+
+
+    <string name="wait">Wait…</string>
+
+    <string name="tips">Tips</string>
+    <string name="edit">Edit</string>
+    <string name="done">Done</string>
+    <string name="exit">Exit</string>
+    <string name="confirm">Confirm</string>
 </resources>

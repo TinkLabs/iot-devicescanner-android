@@ -59,7 +59,7 @@ class SettingFragment:PreferenceFragmentCompat(), SharedPreferences.OnSharedPref
 
     private fun logout() {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(if (BuildConfig.DEBUG) R.string.server_client_id else R.string.server_client_id))
+            .requestIdToken(getString(R.string.server_client_id))
             .requestEmail()
             .build()
         val mGoogleSignInClient = GoogleSignIn.getClient(context!!, googleSignInOptions)

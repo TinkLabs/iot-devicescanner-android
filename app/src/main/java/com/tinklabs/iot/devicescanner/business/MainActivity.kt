@@ -12,10 +12,13 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.tasks.Task
 import com.tinklabs.iot.devicescanner.BuildConfig
 import com.tinklabs.iot.devicescanner.R
@@ -26,16 +29,15 @@ import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(),GoogleApiClient.OnConnectionFailedListener {
 
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    private val hsmdDecoderManager: HSMDecoderManager by inject()
+    private val hsmDecoderManager: HSMDecoderManager by inject()
     private var granted: Boolean = false
 
     companion object {
-        const val SSO_FEATURE_ON: Boolean = false
         const val REQUEST_CODE = 37
         const val MY_PERMISSIONS_REQUEST_CAMERA = 0x2001
     }
@@ -49,8 +51,9 @@ class MainActivity : BaseActivity() {
 
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController)
+        checkPermission()
+
         login()
-        //checkPermission()
     }
 
     private fun checkPermission() {
@@ -87,7 +90,7 @@ class MainActivity : BaseActivity() {
 
     private fun initIfPermissionGranted() {
         granted = true
-        hsmdDecoderManager.init()
+        hsmDecoderManager.init()
     }
     private fun exitIfPermissionDenied() {
         granted = false
@@ -118,7 +121,7 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (granted) {
-            hsmdDecoderManager.release()
+            hsmDecoderManager.release()
         }
     }
 
@@ -129,31 +132,33 @@ class MainActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (REQUEST_CODE == requestCode) {
-            if (Activity.RESULT_CANCELED == resultCode) this.finish()
-            else {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-                handleSignInResult(task)
-            }
+            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+            if (result.isSuccess) handleSignInResult(result.signInAccount!!)
+            else Timber.d("Sign in failed!!!")
         }
     }
 
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) = try {
-        val account = completedTask.getResult(ApiException::class.java)
-
+    private fun handleSignInResult(account: GoogleSignInAccount)  {
         // Signed in successfully, show authenticated UI.
-        checkPermission()
-    } catch (e: ApiException) {
-        // The ApiException status code indicates the detailed failure reason.
-        // Please refer to the GoogleSignInStatusCodes class reference for more information.
-        Timber.d(e)
+        Timber.d(account.email)
     }
 
 
     private fun login() {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(if (BuildConfig.DEBUG) R.string.server_client_id else R.string.server_client_id))
+            .requestIdToken(getString(R.string.server_client_id))
             .requestEmail().build()
-        val mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
-        startActivityForResult(mGoogleSignInClient.signInIntent, REQUEST_CODE)
+        val mGoogleSignInClient =  GoogleApiClient.Builder(this)
+            .enableAutoManage(this, this)
+            .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
+            .build()
+
+        startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(mGoogleSignInClient), REQUEST_CODE)
+    }
+
+    override fun onConnectionFailed(result: ConnectionResult) {
+        Timber.d(result.errorMessage)
+        // need sign in successful to use scanner
+        this.finish()
     }
 }

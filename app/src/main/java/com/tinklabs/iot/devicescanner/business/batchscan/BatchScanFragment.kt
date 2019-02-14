@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.business.batchscan.adapter.ScanItemAdapter
+import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.fragment_batch_scan.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -37,7 +38,6 @@ class BatchScanFragment : Fragment() {
         viewModel.valid.observe(this, Observer {
             if (!it) {
                 scan_result.text = "Not valid scan result: \n ${viewModel.deviceInfo.value?.imei}\n${viewModel.deviceInfo.value?.snCode}"
-
                 /*Answers.getInstance()
                     .logCustom(CustomEvent("Scan")
                         .putCustomAttribute("VALID", "NO"))*/
@@ -47,7 +47,20 @@ class BatchScanFragment : Fragment() {
         })
 
         fab.setOnClickListener {
-            viewModel.upload()
+            decodeComponent.enableScanning(false)
+            ConfirmDialog(context!!)
+                .cancelable(false)
+                .title(R.string.tips)
+                .content("Confirm to upload these information?")
+                .confirmText(R.string.upload)
+                .onConfirm(View.OnClickListener {
+                    viewModel.upload()
+                    decodeComponent.enableScanning(true)
+                })
+                .onCancel(View.OnClickListener {
+                    decodeComponent.enableScanning(true)
+                })
+                .show()
         }
     }
 
@@ -68,5 +81,6 @@ class BatchScanFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.onDestroyView()
+        decodeComponent.dispose()
     }
 }

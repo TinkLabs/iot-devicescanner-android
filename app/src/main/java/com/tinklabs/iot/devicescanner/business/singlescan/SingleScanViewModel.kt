@@ -58,8 +58,10 @@ class SingleScanViewModel constructor(
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe { result ->
                 Timber.d(result.message)
+                if (result.code == 0) {
+                    // upload success will update UI
+                }
             })
-        resetValue()
     }
 
     override fun onHSMDecodeResult(results: Array<out HSMDecodeResult>?) {

@@ -78,9 +78,11 @@ class BatchScanViewModel constructor(
         compDisposable.add(httpApi.uploadDeviceInfo(uploads)
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe { result ->
-                Timber.d(result.message)
+                if (result.code == 0) {
+                    // upload success will reset UI
+                    resetValue()
+                }
             })
-        resetValue()
     }
 
     fun onResume() {
