@@ -1,5 +1,7 @@
 package com.tinklabs.iot.devicescanner.di
 
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.business.batchscan.BatchScanViewModel
 import com.tinklabs.iot.devicescanner.business.singlescan.SingleScanViewModel
 import com.tinklabs.iot.devicescanner.http.BaseApiClient
@@ -25,5 +27,12 @@ val appModule: Module = module {
 
     single {
         BaseApiClient().createService(HttpApi::class.java)
+    }
+
+    factory {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            //.requestIdToken(androidApplication().getString(R.string.server_client_id))
+            .requestEmail()
+            .build()
     }
 }
