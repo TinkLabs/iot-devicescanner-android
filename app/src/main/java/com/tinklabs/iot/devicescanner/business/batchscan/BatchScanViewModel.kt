@@ -70,10 +70,10 @@ class BatchScanViewModel constructor(
 
     }
 
-    fun upload() {
+    fun upload(status:String) {
         val uploads = mutableListOf<UploadModel>()
         _items.value?.forEach {
-            uploads.add(it.transform("Ready"))
+            uploads.add(it.transform(status = status))
         }
         compDisposable.add(httpApi.uploadDeviceInfo(uploads)
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

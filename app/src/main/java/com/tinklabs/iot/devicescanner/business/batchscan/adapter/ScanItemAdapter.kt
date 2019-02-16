@@ -1,5 +1,6 @@
 package com.tinklabs.iot.devicescanner.business.batchscan.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,7 @@ import com.tinklabs.iot.devicescanner.data.DeviceInfo
 import kotlinx.android.synthetic.main.item_device.view.*
 
 class ScanItemAdapter: RecyclerView.Adapter<ScanItemAdapter.ScanItemViewHolder>() {
-    lateinit var onClick: (info: DeviceInfo) -> Unit
+    lateinit var onRemove: (info: DeviceInfo) -> Unit
 
     var items: MutableList<DeviceInfo> = mutableListOf()
         set(value) {
@@ -26,17 +27,18 @@ class ScanItemAdapter: RecyclerView.Adapter<ScanItemAdapter.ScanItemViewHolder>(
         holder.data = items[position]
         holder.itemView.removeIcon.setOnClickListener {
             holder.data?.let {
-                it -> onClick(it)
+                it -> onRemove(it)
             }
         }
     }
 
-    fun setRemoveClickListener(onClick: (info: DeviceInfo) -> Unit) {
-        this.onClick = onClick
+    fun setRemoveClickListener(onRemove: (info: DeviceInfo) -> Unit) {
+        this.onRemove = onRemove
     }
 
     class ScanItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var data: DeviceInfo? = null
+            @SuppressLint("SetTextI18n")
             set(value) {
                 field = value
                 itemView.item_imei.text = "IMEI: ${value?.imei}"

@@ -53,8 +53,8 @@ class SingleScanViewModel constructor(
         compDisposable.clear()
     }
 
-    fun upload() {
-        compDisposable.add(httpApi.uploadDeviceInfo(listOf(deviceInfo.value?.transform("Ready")!!))
+    fun upload(status: String) {
+        compDisposable.add(httpApi.uploadDeviceInfo(listOf(deviceInfo.value?.transform(status = status)!!))
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe { result ->
                 Timber.d(result.message)
