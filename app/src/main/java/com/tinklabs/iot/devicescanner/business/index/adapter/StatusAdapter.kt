@@ -25,7 +25,9 @@ class StatusAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var dataSet: MutableList<StatusItem> = mutableListOf(
         StatusItem(0, "Ready"),
         StatusItem(1, "Repair"),
-        StatusItem(2, "Damaged")
+        StatusItem(2, "Damaged"),
+        StatusItem(3, "Delivering"),
+        StatusItem(4, "Preparing")
     )
 
     //private var dataSet: MutableList<StatusItem> = mutableListOf()
