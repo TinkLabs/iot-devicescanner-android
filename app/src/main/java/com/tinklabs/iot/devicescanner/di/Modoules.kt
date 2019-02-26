@@ -17,7 +17,7 @@ val appModule: Module = module {
     }
 
     viewModel {
-        BatchScanViewModel(androidApplication(), get(), get())
+            params -> BatchScanViewModel(params[0], get(), get())
     }
 
     single {

@@ -45,8 +45,6 @@ class MainActivity : BaseActivity() {
 
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController)
-
-        doSignIn()
     }
 
     private fun checkPermission() {
@@ -146,6 +144,11 @@ class MainActivity : BaseActivity() {
         val account:GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
         Timber.d(account?.email)
         // if account not null, skip sign in check
+        if(null != account && account.email?.isNotEmpty() == true) {
+            checkPermission()
+        } else {
+            doSignIn()
+        }
     }
 
     private val googleSignInOptions:GoogleSignInOptions by inject()
