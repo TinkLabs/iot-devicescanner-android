@@ -14,12 +14,13 @@ import com.tinklabs.iot.devicescanner.business.index.IndexFragment
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.fragment_batch_scan.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 class BatchScanFragment : Fragment() {
 
     private lateinit var status: String
-    private val viewModel by viewModel<BatchScanViewModel>()
+    private val viewModel by viewModel<BatchScanViewModel> { parametersOf(context) }
 
     private val mAdapter = ScanItemAdapter()
 

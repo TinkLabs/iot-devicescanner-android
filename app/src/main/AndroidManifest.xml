@@ -10,7 +10,8 @@
             android:supportsRtl="true"
             android:name=".app.DSApplication"
             android:theme="@style/AppTheme">
-        <activity android:name=".business.MainActivity">
+        <activity android:name=".business.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

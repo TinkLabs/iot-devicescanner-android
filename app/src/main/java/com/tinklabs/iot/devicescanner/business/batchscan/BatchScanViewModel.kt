@@ -14,6 +14,7 @@ import com.tinklabs.iot.devicescanner.ext.toast
 import com.tinklabs.iot.devicescanner.ext.transform
 import com.tinklabs.iot.devicescanner.http.HttpApi
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
+import com.tinklabs.iot.devicescanner.widget.LoadingDialogFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
@@ -27,6 +28,7 @@ class BatchScanViewModel constructor(
 ) : ViewModel(), DecodeResultListener {
 
     private val compDisposable = CompositeDisposable()
+    private var loadingDialog: LoadingDialogFactory = LoadingDialogFactory(context)
 
     private val _deviceInfo = MutableLiveData<DeviceInfo>()
     val deviceInfo: LiveData<DeviceInfo>
@@ -85,11 +87,19 @@ class BatchScanViewModel constructor(
             httpApi.uploadDeviceInfo(uploads)
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableObserver<HttpRespone>() {
+
+                    override fun onStart() {
+                        super.onStart()
+                        loadingDialog.show()
+                    }
+
                     override fun onComplete() {
+                        loadingDialog.dismiss()
                         dispose()
                     }
 
                     override fun onNext(result: HttpRespone) {
+                        loadingDialog.dismiss()
                         Timber.d(result.message)
                         if (result.code == 0) {
                             // upload success will update UI
@@ -100,6 +110,7 @@ class BatchScanViewModel constructor(
 
                     override fun onError(e: Throwable) {
                         Timber.e(e)
+                        loadingDialog.dismiss()
                         context.toast(e.message ?: "Http request error")
                     }
                 })

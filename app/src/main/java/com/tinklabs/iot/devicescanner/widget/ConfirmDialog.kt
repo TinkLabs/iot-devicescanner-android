@@ -60,6 +60,11 @@ class ConfirmDialog(context: Context) : AppCompatDialog(context, R.style.Confirm
         return this
     }
 
+    fun cancelTextColor(colorRes: Int): ConfirmDialog {
+        btnCancel.setTextColor(ActivityCompat.getColor(context, colorRes))
+        return this
+    }
+
     fun title(titleId: Int): ConfirmDialog {
         tvTitle.setText(titleId)
         return this

@@ -2,7 +2,6 @@ package com.tinklabs.iot.devicescanner.business.index
 
 import android.os.Bundle
 import android.view.*
-import androidx.annotation.IdRes
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -10,8 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.business.index.adapter.StatusAdapter
-import com.tinklabs.iot.devicescanner.ext.toast
-import kotlinx.android.synthetic.main.index_layout.*
+import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.index_layout.view.*
 
 
@@ -23,19 +21,21 @@ class IndexFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.index_layout, container, false)
-        view.SingleScan.setOnClickListener {
-            navigateTo(R.id.action_to_single_scan)
-        }
-        view.BatchScan.setOnClickListener {
-            navigateTo(R.id.action_to_batch_scan)
-        }
         setHasOptionsMenu(true)
 
         view.recyclerView.layoutManager = LinearLayoutManager(context).apply { orientation = RecyclerView.VERTICAL }
         val adapter = StatusAdapter()
-        adapter.setCompletedListener {
-            tvStatus.setText(it)
-            tvStatus.setSelection(it.length) //
+        adapter.setCompletedListener { status ->
+            ConfirmDialog(context!!)
+                .cancelable(false)
+                .title(getString(R.string.tips))
+                .content("Status: $status \nDo you sure?")
+                .cancelTextColor(R.color.red_700)
+                .confirmText(R.string.confirm)
+                .onConfirm(View.OnClickListener {
+                    navigateTo(status)
+                })
+                .show()
         }
         view.recyclerView.adapter = adapter
 
@@ -45,13 +45,8 @@ class IndexFragment : Fragment() {
     /**
      * navigate to fragment
      */
-    private fun navigateTo(@IdRes resId: Int) {
-        val status: String = tvStatus.text.toString()
-        if (status.isEmpty()) {
-            toast("please input or select status you will upload devices")
-            return
-        }
-        findNavController().navigate(resId, bundleOf(STATUS_BUNDLE_KEY to status))
+    private fun navigateTo(status:String) {
+        findNavController().navigate(R.id.action_to_batch_scan, bundleOf(STATUS_BUNDLE_KEY to status))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
