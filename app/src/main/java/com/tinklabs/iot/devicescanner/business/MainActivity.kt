@@ -164,7 +164,7 @@ class MainActivity : BaseActivity() {
         if (null != account && account.email?.isNotEmpty() == true) {
             checkPermission()
         } else {
-            //doSignIn()
+            doSignIn()
         }
     }
 
