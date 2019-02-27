@@ -2,7 +2,7 @@ package com.tinklabs.iot.devicescanner.data.remote
 
 import com.google.gson.annotations.SerializedName
 
-data class HttpRespone(
+data class HttpResponse(
     @SerializedName("Code")
     val code: Int,
     @SerializedName("Msg")

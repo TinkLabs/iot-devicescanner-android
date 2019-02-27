@@ -12,4 +12,8 @@ data class StatusItem(
     override fun hashCode(): Int {
         return uid
     }
+
+    override fun toString(): String {
+        return "{UID: ${uid}, STATUS: ${status}}"
+    }
 }

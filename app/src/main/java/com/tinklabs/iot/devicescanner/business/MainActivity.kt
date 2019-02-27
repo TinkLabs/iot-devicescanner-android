@@ -1,6 +1,7 @@
 package com.tinklabs.iot.devicescanner.business
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -17,7 +18,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
+import com.tinklabs.iot.devicescanner.data.remote.HttpResponse
+import com.tinklabs.iot.devicescanner.data.remote.StateResponse
+import com.tinklabs.iot.devicescanner.db.AppDataBase
+import com.tinklabs.iot.devicescanner.http.HttpApi
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableObserver
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -29,6 +37,7 @@ class MainActivity : BaseActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private val hsmDecoderManager: HSMDecoderManager by inject()
+    private val dataBase: AppDataBase by inject()
     private var granted: Boolean = false
 
     companion object {
@@ -36,12 +45,19 @@ class MainActivity : BaseActivity() {
         const val MY_PERMISSIONS_REQUEST_CAMERA = 0x2001
     }
 
+    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         navController = Navigation.findNavController(this, R.id.nav_fragment)
         appBarConfiguration = AppBarConfiguration(navController.graph)
+
+        Thread {
+            dataBase.statusDao().loadAllStatus().forEach {
+                Timber.d(it.toString())
+            }
+        }.start()
 
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController)
@@ -86,6 +102,7 @@ class MainActivity : BaseActivity() {
         granted = true
         hsmDecoderManager.init()
     }
+
     private fun exitIfPermissionDenied() {
         granted = false
         this.finish()
@@ -133,7 +150,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun handleSignInResult(account: GoogleSignInAccount)  {
+    private fun handleSignInResult(account: GoogleSignInAccount) {
         // Signed in successfully, show authenticated UI.
         checkPermission()
         Timber.d(account.email)
@@ -141,17 +158,17 @@ class MainActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        val account:GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
+        val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
         Timber.d(account?.email)
         // if account not null, skip sign in check
-        if(null != account && account.email?.isNotEmpty() == true) {
+        if (null != account && account.email?.isNotEmpty() == true) {
             checkPermission()
         } else {
-            doSignIn()
+            //doSignIn()
         }
     }
 
-    private val googleSignInOptions:GoogleSignInOptions by inject()
+    private val googleSignInOptions: GoogleSignInOptions by inject()
 
     private fun doSignIn() {
         val mGoogleSignInClient = GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
