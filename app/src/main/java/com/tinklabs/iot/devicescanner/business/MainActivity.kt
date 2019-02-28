@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
@@ -16,9 +17,12 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
+import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -157,7 +161,25 @@ class MainActivity : BaseActivity() {
     private val googleSignInOptions: GoogleSignInOptions by inject()
 
     private fun doSignIn() {
-        val mGoogleSignInClient = GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
-        startActivityForResult(mGoogleSignInClient.signInIntent, REQUEST_CODE)
+        val googleApiAvailability = GoogleApiAvailability.getInstance()
+        val status = googleApiAvailability.isGooglePlayServicesAvailable(this)
+        if (status != ConnectionResult.SUCCESS) {
+            ConfirmDialog(this)
+                .cancelable(false)
+                .title(R.string.tips)
+                .content("Need to update Google Service to use Devices Scanner!!!")
+                .confirmText(R.string.confirm)
+                .cancelText(R.string.exit)
+                .onConfirm(View.OnClickListener {
+                    finish()
+                })
+                .onCancel(View.OnClickListener {
+                    finish()
+                })
+                .show()
+        } else {
+            val mGoogleSignInClient = GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
+            startActivityForResult(mGoogleSignInClient.signInIntent, REQUEST_CODE)
+        }
     }
 }
