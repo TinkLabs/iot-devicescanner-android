@@ -103,8 +103,12 @@ class BatchScanViewModel constructor(
                         Timber.d(result.message)
                         if (result.code == 0) {
                             // upload success will update UI
+                            context.toast("Upload successful!!!")
+                            loadItems()
+                            resetValue()
                         } else {
                             // upload failed tips error message
+                            context.toast("Upload failed!!!")
                         }
                     }
 
