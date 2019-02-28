@@ -37,7 +37,6 @@ class MainActivity : BaseActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private val hsmDecoderManager: HSMDecoderManager by inject()
-    private val dataBase: AppDataBase by inject()
     private var granted: Boolean = false
 
     companion object {
@@ -52,12 +51,6 @@ class MainActivity : BaseActivity() {
 
         navController = Navigation.findNavController(this, R.id.nav_fragment)
         appBarConfiguration = AppBarConfiguration(navController.graph)
-
-        Thread {
-            dataBase.statusDao().loadAllStatus().forEach {
-                Timber.d(it.toString())
-            }
-        }.start()
 
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController)
