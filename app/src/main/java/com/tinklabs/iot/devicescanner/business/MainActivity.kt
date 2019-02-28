@@ -18,14 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
-import com.tinklabs.iot.devicescanner.data.remote.HttpResponse
-import com.tinklabs.iot.devicescanner.data.remote.StateResponse
-import com.tinklabs.iot.devicescanner.db.AppDataBase
-import com.tinklabs.iot.devicescanner.http.HttpApi
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableObserver
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
