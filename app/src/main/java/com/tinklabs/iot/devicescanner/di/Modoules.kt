@@ -3,6 +3,7 @@ package com.tinklabs.iot.devicescanner.di
 import androidx.room.Room
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.tinklabs.iot.devicescanner.business.batchscan.BatchScanViewModel
+import com.tinklabs.iot.devicescanner.business.index.IndexViewModel
 import com.tinklabs.iot.devicescanner.business.singlescan.SingleScanViewModel
 import com.tinklabs.iot.devicescanner.db.AppDataBase
 import com.tinklabs.iot.devicescanner.http.BaseApiClient
@@ -20,6 +21,10 @@ val appModule: Module = module {
 
     viewModel {
             params -> BatchScanViewModel(params[0], get(), get())
+    }
+
+    viewModel {
+        IndexViewModel(get())
     }
 
     single {

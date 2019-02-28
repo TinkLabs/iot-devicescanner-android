@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.tinklabs.iot.devicescanner.data.StatusItem
-
+import io.reactivex.Flowable
 
 
 @Dao
@@ -14,5 +14,5 @@ interface StatusDao {
     fun insert(vararg status: StatusItem)
 
     @Query("SELECT * FROM tb_status")
-    fun loadAllStatus(): Array<StatusItem>
+    fun loadAllStatus(): Flowable<List<StatusItem>>
 }

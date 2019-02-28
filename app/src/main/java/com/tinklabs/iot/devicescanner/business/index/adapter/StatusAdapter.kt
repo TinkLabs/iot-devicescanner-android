@@ -1,13 +1,15 @@
 package com.tinklabs.iot.devicescanner.business.index.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.jakewharton.rxbinding3.view.clicks
 import com.tinklabs.iot.devicescanner.R
-import com.tinklabs.iot.devicescanner.data.StatusItem
 import kotlinx.android.synthetic.main.item_status.view.*
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class StatusAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -22,13 +24,7 @@ class StatusAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val STATUS_VIEW_TYPE = 0x003
     }
 
-    private var dataSet: MutableList<StatusItem> = mutableListOf(
-        StatusItem(0, "Ready"),
-        StatusItem(1, "Repair"),
-        StatusItem(2, "Damaged"),
-        StatusItem(3, "Delivering"),
-        StatusItem(4, "Preparing")
-    )
+    private var dataSet: List<String> = emptyList()
 
     //private var dataSet: MutableList<StatusItem> = mutableListOf()
 
@@ -43,8 +39,9 @@ class StatusAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         else StatusViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_status, parent, false))
     }
 
-    override fun getItemCount(): Int = if (dataSet.size == 0) 1 else dataSet.size
+    override fun getItemCount(): Int = if (dataSet.isEmpty()) 1 else dataSet.size
 
+    @SuppressLint("CheckResult")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val viewType = getItemViewType(position)
         if (EMPTY_VIEW_TYPE == viewType) {
@@ -52,27 +49,33 @@ class StatusAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         } else {
             holder as StatusViewHolder
             holder.data = dataSet[position]
-            holder.itemView.setOnClickListener {
-                holder.data?.let {
-                    Timber.d(holder.data?.status)
-                    onCompleted(holder.data?.status ?: "")
+            holder.itemView.clicks().throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribe {
+                    holder.data?.let {
+                        Timber.d(holder.data ?: "")
+                        onCompleted(holder.data ?: "")
+                    }
                 }
-            }
         }
 
     }
 
-    override fun getItemViewType(position: Int): Int = if (0 == dataSet.size) EMPTY_VIEW_TYPE else STATUS_VIEW_TYPE
+    fun setData(data: List<String>) {
+        dataSet = data
+        notifyDataSetChanged()
+    }
+
+    override fun getItemViewType(position: Int): Int = if (dataSet.isEmpty()) EMPTY_VIEW_TYPE else STATUS_VIEW_TYPE
 
 
     /**
      * Status Item View
      */
     class StatusViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var data: StatusItem? = null
+        var data: String? = null
             set(value) {
                 field = value
-                itemView.itemTvStatus.text = field?.status
+                itemView.itemTvStatus.text = field ?: ""
             }
     }
 

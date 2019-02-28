@@ -1,17 +1,24 @@
 package com.tinklabs.iot.devicescanner.business.index
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tinklabs.iot.devicescanner.R
+import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_COMPLETE
+import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_EMPTY
+import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_ERROR
+import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_LOADING
 import com.tinklabs.iot.devicescanner.business.index.adapter.StatusAdapter
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.index_layout.*
 import kotlinx.android.synthetic.main.index_layout.view.*
+import org.koin.android.ext.android.inject
 
 
 class IndexFragment : Fragment() {
@@ -19,16 +26,16 @@ class IndexFragment : Fragment() {
         const val STATUS_BUNDLE_KEY = "status"
     }
 
+    private val viewModel: IndexViewModel by inject()
+
+    private val adapter = StatusAdapter()
+
+    @SuppressLint("CheckResult")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.index_layout, container, false)
         setHasOptionsMenu(true)
 
-        view.stateLayout.showEmpty()
-        view.stateLayout.setEmptyClickListener { view.stateLayout.showError() }
-        view.stateLayout.setErrorClickListener { view.stateLayout.showContent() }
-
         view.recyclerView.layoutManager = LinearLayoutManager(context).apply { orientation = RecyclerView.VERTICAL }
-        val adapter = StatusAdapter()
         adapter.setCompletedListener { status ->
             ConfirmDialog(context!!)
                 .cancelable(false)
@@ -43,7 +50,30 @@ class IndexFragment : Fragment() {
         }
         view.recyclerView.adapter = adapter
 
+        viewModel.loadStatus()
+
         return view
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel.status.observe(this, Observer {
+            when(it) {
+                STATUS_EMPTY -> stateLayout.showEmpty()
+                STATUS_LOADING -> stateLayout.showLoading()
+                STATUS_ERROR -> stateLayout.showError()
+                STATUS_COMPLETE -> stateLayout.showContent()
+            }
+        })
+
+        viewModel.stateData.observe(this, Observer {
+            adapter.setData(it)
+        })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.onDestroyView()
     }
 
     /**
