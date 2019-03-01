@@ -1,9 +1,11 @@
 package com.tinklabs.iot.devicescanner.business
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
@@ -15,11 +17,16 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
+import com.tinklabs.iot.devicescanner.ext.toast
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
+import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -29,6 +36,7 @@ class MainActivity : BaseActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private val hsmDecoderManager: HSMDecoderManager by inject()
+    private val mainViewModel by viewModel<MainViewModel>()
     private var granted: Boolean = false
 
     companion object {
@@ -36,6 +44,7 @@ class MainActivity : BaseActivity() {
         const val MY_PERMISSIONS_REQUEST_CAMERA = 0x2001
     }
 
+    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -86,6 +95,7 @@ class MainActivity : BaseActivity() {
         granted = true
         hsmDecoderManager.init()
     }
+
     private fun exitIfPermissionDenied() {
         granted = false
         this.finish()
@@ -128,33 +138,58 @@ class MainActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (REQUEST_CODE == requestCode) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+            Timber.d("Code: ${result.status.statusCode}, Message: ${result.status.statusMessage}")
             if (result.isSuccess) handleSignInResult(result.signInAccount!!)
-            else this.finish()
+            else {
+                toast("sign in failed")
+                this.finish()
+            }
         }
     }
 
-    private fun handleSignInResult(account: GoogleSignInAccount)  {
+    private fun handleSignInResult(account: GoogleSignInAccount) {
         // Signed in successfully, show authenticated UI.
+        mainViewModel.setSignInStatus(true)
         checkPermission()
         Timber.d(account.email)
     }
 
     override fun onStart() {
         super.onStart()
-        val account:GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
+        val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
         Timber.d(account?.email)
         // if account not null, skip sign in check
-        if(null != account && account.email?.isNotEmpty() == true) {
+        if (null != account && account.email?.isNotEmpty() == true) {
             checkPermission()
+            mainViewModel.setSignInStatus(true)
         } else {
+            mainViewModel.setSignInStatus(false)
             doSignIn()
         }
     }
 
-    private val googleSignInOptions:GoogleSignInOptions by inject()
+    private val googleSignInOptions: GoogleSignInOptions by inject()
 
     private fun doSignIn() {
-        val mGoogleSignInClient = GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
-        startActivityForResult(mGoogleSignInClient.signInIntent, REQUEST_CODE)
+        val googleApiAvailability = GoogleApiAvailability.getInstance()
+        val status = googleApiAvailability.isGooglePlayServicesAvailable(this)
+        if (status != ConnectionResult.SUCCESS) {
+            ConfirmDialog(this)
+                .cancelable(false)
+                .title(R.string.tips)
+                .content("Need to update Google Service to use Devices Scanner!!!")
+                .confirmText(R.string.confirm)
+                .cancelText(R.string.exit)
+                .onConfirm(View.OnClickListener {
+                    finish()
+                })
+                .onCancel(View.OnClickListener {
+                    finish()
+                })
+                .show()
+        } else {
+            val mGoogleSignInClient = GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
+            startActivityForResult(mGoogleSignInClient.signInIntent, REQUEST_CODE)
+        }
     }
 }

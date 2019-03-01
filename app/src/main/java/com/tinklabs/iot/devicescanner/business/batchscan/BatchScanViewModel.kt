@@ -8,7 +8,7 @@ import com.honeywell.barcode.HSMDecodeResult
 import com.honeywell.plugins.decode.DecodeResultListener
 import com.tinklabs.iot.devicescanner.business.singlescan.SingleScanViewModel
 import com.tinklabs.iot.devicescanner.data.DeviceInfo
-import com.tinklabs.iot.devicescanner.data.remote.HttpRespone
+import com.tinklabs.iot.devicescanner.data.remote.HttpResponse
 import com.tinklabs.iot.devicescanner.data.remote.UploadModel
 import com.tinklabs.iot.devicescanner.ext.toast
 import com.tinklabs.iot.devicescanner.ext.transform
@@ -86,7 +86,7 @@ class BatchScanViewModel constructor(
         compDisposable.add(
             httpApi.uploadDeviceInfo(uploads)
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : DisposableObserver<HttpRespone>() {
+                .subscribeWith(object : DisposableObserver<HttpResponse>() {
 
                     override fun onStart() {
                         super.onStart()
@@ -98,13 +98,17 @@ class BatchScanViewModel constructor(
                         dispose()
                     }
 
-                    override fun onNext(result: HttpRespone) {
+                    override fun onNext(result: HttpResponse) {
                         loadingDialog.dismiss()
                         Timber.d(result.message)
                         if (result.code == 0) {
                             // upload success will update UI
+                            context.toast("Upload successful!!!")
+                            loadItems()
+                            resetValue()
                         } else {
                             // upload failed tips error message
+                            context.toast("Upload failed!!!")
                         }
                     }
 

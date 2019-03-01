@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.honeywell.barcode.HSMDecodeResult
 import com.honeywell.plugins.decode.DecodeResultListener
 import com.tinklabs.iot.devicescanner.data.DeviceInfo
-import com.tinklabs.iot.devicescanner.data.remote.HttpRespone
+import com.tinklabs.iot.devicescanner.data.remote.HttpResponse
 import com.tinklabs.iot.devicescanner.ext.toast
 import com.tinklabs.iot.devicescanner.ext.transform
 import com.tinklabs.iot.devicescanner.http.HttpApi
@@ -61,12 +61,12 @@ class SingleScanViewModel constructor(
     fun upload(status: String) {
         compDisposable.add(httpApi.uploadDeviceInfo(listOf(deviceInfo.value?.transform(status = status)!!))
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : DisposableObserver<HttpRespone>() {
+            .subscribeWith(object : DisposableObserver<HttpResponse>() {
                 override fun onComplete() {
                     dispose()
                 }
 
-                override fun onNext(result: HttpRespone) {
+                override fun onNext(result: HttpResponse) {
                     Timber.d(result.message)
 
                     if (result.code == 0) {
