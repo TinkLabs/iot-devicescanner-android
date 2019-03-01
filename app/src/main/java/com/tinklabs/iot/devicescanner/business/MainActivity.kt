@@ -26,6 +26,7 @@ import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -35,6 +36,7 @@ class MainActivity : BaseActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private val hsmDecoderManager: HSMDecoderManager by inject()
+    private val mainViewModel by viewModel<MainViewModel>()
     private var granted: Boolean = false
 
     companion object {
@@ -147,6 +149,7 @@ class MainActivity : BaseActivity() {
 
     private fun handleSignInResult(account: GoogleSignInAccount) {
         // Signed in successfully, show authenticated UI.
+        mainViewModel.setSignInStatus(true)
         checkPermission()
         Timber.d(account.email)
     }
@@ -158,7 +161,9 @@ class MainActivity : BaseActivity() {
         // if account not null, skip sign in check
         if (null != account && account.email?.isNotEmpty() == true) {
             checkPermission()
+            mainViewModel.setSignInStatus(true)
         } else {
+            mainViewModel.setSignInStatus(false)
             doSignIn()
         }
     }

@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tinklabs.iot.devicescanner.R
+import com.tinklabs.iot.devicescanner.business.MainViewModel
 import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_COMPLETE
 import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_EMPTY
 import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_ERROR
@@ -18,7 +19,9 @@ import com.tinklabs.iot.devicescanner.business.index.adapter.StatusAdapter
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.index_layout.*
 import kotlinx.android.synthetic.main.index_layout.view.*
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 
 class IndexFragment : Fragment() {
@@ -26,7 +29,8 @@ class IndexFragment : Fragment() {
         const val STATUS_BUNDLE_KEY = "status"
     }
 
-    private val viewModel: IndexViewModel by inject()
+    private val viewModel by viewModel<IndexViewModel>()
+    private val mainViewModel:MainViewModel by sharedViewModel()
 
     private val adapter = StatusAdapter()
 
@@ -50,8 +54,6 @@ class IndexFragment : Fragment() {
         }
         view.recyclerView.adapter = adapter
 
-        viewModel.loadStatus()
-
         return view
     }
 
@@ -69,7 +71,13 @@ class IndexFragment : Fragment() {
         viewModel.stateData.observe(this, Observer {
             adapter.setData(it)
         })
+
+        mainViewModel.isSignedIn.observe(this, Observer {
+            Timber.d("sign in status: $it")
+            if (it) viewModel.loadStatus() // sign successful should get status list.
+        })
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
