@@ -36,7 +36,7 @@ class IndexViewModel(
     @SuppressLint("CheckResult")
     fun loadStatus() {
         compDisposable.add(
-            httpApi.getStates("https://ca7s8egmxc.execute-api.ap-southeast-1.amazonaws.com/prod/device-status")
+            httpApi.getStates("https://zwg4ud7ru6.execute-api.ap-southeast-1.amazonaws.com/prod/api/v1/device-status")
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .map {
                     it.status

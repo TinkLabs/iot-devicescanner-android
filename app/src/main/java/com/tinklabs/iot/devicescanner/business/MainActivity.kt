@@ -21,6 +21,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
+import com.tinklabs.iot.devicescanner.ext.toast
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
@@ -135,8 +136,12 @@ class MainActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (REQUEST_CODE == requestCode) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+            Timber.d("Code: ${result.status.statusCode}, Message: ${result.status.statusMessage}")
             if (result.isSuccess) handleSignInResult(result.signInAccount!!)
-            else this.finish()
+            else {
+                toast("sign in failed")
+                this.finish()
+            }
         }
     }
 
