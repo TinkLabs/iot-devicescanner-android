@@ -30,7 +30,8 @@ class IndexFragment : Fragment() {
     }
 
     private val viewModel by viewModel<IndexViewModel>()
-    private val mainViewModel:MainViewModel by sharedViewModel()
+    private val mainViewModel: MainViewModel by sharedViewModel()
+    private var isInited = false // because go back refresh and call http request for status. add this will don't request again
 
     private val adapter = StatusAdapter()
 
@@ -60,7 +61,7 @@ class IndexFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel.status.observe(this, Observer {
-            when(it) {
+            when (it) {
                 STATUS_EMPTY -> stateLayout.showEmpty()
                 STATUS_LOADING -> stateLayout.showLoading()
                 STATUS_ERROR -> stateLayout.showError()
@@ -69,12 +70,13 @@ class IndexFragment : Fragment() {
         })
 
         viewModel.stateData.observe(this, Observer {
+            isInited = true
             adapter.setData(it)
         })
 
         mainViewModel.isSignedIn.observe(this, Observer {
             Timber.d("sign in status: $it")
-            if (it) viewModel.loadStatus() // sign successful should get status list.
+            if (it && !isInited) viewModel.loadStatus() // sign successful should get status list.
         })
     }
 

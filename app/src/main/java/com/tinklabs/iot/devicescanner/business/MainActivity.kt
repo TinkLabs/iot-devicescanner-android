@@ -17,8 +17,10 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.honeywell.barcode.HSMDecoder
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
 import com.tinklabs.iot.devicescanner.ext.toast
@@ -27,6 +29,7 @@ import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -35,7 +38,7 @@ class MainActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    private val hsmDecoderManager: HSMDecoderManager by inject()
+    private val hsmDecoderManager: HSMDecoderManager by inject { parametersOf(this)}
     private val mainViewModel by viewModel<MainViewModel>()
     private var granted: Boolean = false
 
@@ -138,9 +141,13 @@ class MainActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (REQUEST_CODE == requestCode) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            Timber.d("Code: ${result.status.statusCode}, Message: ${result.status.statusMessage}")
             if (result.isSuccess) handleSignInResult(result.signInAccount!!)
             else {
+                /**
+                 * sign in progress will call here. and result is null,
+                 * so return then sign in success will call {@link #onActivityResult()} again.
+                 */
+                if (result.status.statusCode == GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS) return
                 toast("sign in failed")
                 this.finish()
             }

@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.honeywell.barcode.HSMDecodeResult
 import com.honeywell.plugins.decode.DecodeResultListener
-import com.tinklabs.iot.devicescanner.business.singlescan.SingleScanViewModel
+import com.tinklabs.iot.devicescanner.business.batchscan.BatchScanFragment.Companion.IMEI_LENGTH
 import com.tinklabs.iot.devicescanner.data.DeviceInfo
 import com.tinklabs.iot.devicescanner.data.remote.HttpResponse
 import com.tinklabs.iot.devicescanner.data.remote.UploadModel
@@ -28,7 +28,7 @@ class BatchScanViewModel constructor(
 ) : ViewModel(), DecodeResultListener {
 
     private val compDisposable = CompositeDisposable()
-    private var loadingDialog: LoadingDialogFactory = LoadingDialogFactory(context)
+    private val loadingDialog: LoadingDialogFactory = LoadingDialogFactory(context)
 
     private val _deviceInfo = MutableLiveData<DeviceInfo>()
     val deviceInfo: LiveData<DeviceInfo>
@@ -139,14 +139,14 @@ class BatchScanViewModel constructor(
             if (results.size < 2) return
 
             val barcodeData0 = results[0].barcodeData
-            if (barcodeData0.length == SingleScanViewModel.IMEI_LENGTH) {
+            if (barcodeData0.length == IMEI_LENGTH) {
                 _deviceInfo.value?.imei = barcodeData0
             } else {
                 _deviceInfo.value?.snCode = barcodeData0
             }
 
             val barcodeData1 = results[1].barcodeData
-            if (barcodeData1.length == SingleScanViewModel.IMEI_LENGTH) {
+            if (barcodeData1.length == IMEI_LENGTH) {
                 _deviceInfo.value?.imei = barcodeData1
             } else {
                 _deviceInfo.value?.snCode = barcodeData1

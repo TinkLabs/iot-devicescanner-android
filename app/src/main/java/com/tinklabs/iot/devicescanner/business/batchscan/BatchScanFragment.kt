@@ -18,9 +18,11 @@ import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 class BatchScanFragment : Fragment() {
-
+    companion object {
+        const val IMEI_LENGTH = 15
+    }
     private lateinit var status: String
-    private val viewModel by viewModel<BatchScanViewModel> { parametersOf(context) }
+    private val viewModel by viewModel<BatchScanViewModel>{ parametersOf(context)}
 
     private val mAdapter = ScanItemAdapter()
 
@@ -51,7 +53,7 @@ class BatchScanFragment : Fragment() {
         viewModel.valid.observe(this, Observer {
             if (!it) {
                 scan_result.text =
-                        "Not valid scan result: \n ${viewModel.deviceInfo.value?.imei}\n${viewModel.deviceInfo.value?.snCode}"
+                    "Not valid scan result: \n ${viewModel.deviceInfo.value?.imei}\n${viewModel.deviceInfo.value?.snCode}"
                 /*Answers.getInstance()
                     .logCustom(CustomEvent("Scan")
                         .putCustomAttribute("VALID", "NO"))*/
@@ -92,6 +94,5 @@ class BatchScanFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.onDestroyView()
-        decodeComponent.dispose()
     }
 }
