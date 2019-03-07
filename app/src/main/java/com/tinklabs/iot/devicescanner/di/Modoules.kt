@@ -18,7 +18,7 @@ import org.koin.dsl.module.module
 val appModule: Module = module {
 
     viewModel {
-            params -> BatchScanViewModel(params[0], get(), get())
+            params -> BatchScanViewModel(params[0], get())
     }
 
     viewModel {
@@ -29,7 +29,7 @@ val appModule: Module = module {
         MainViewModel()
     }
 
-    single {
+    factory {
         HSMDecoderManager(androidContext())
     }
 

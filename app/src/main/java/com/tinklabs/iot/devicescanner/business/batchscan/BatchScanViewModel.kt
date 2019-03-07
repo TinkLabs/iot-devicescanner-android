@@ -23,9 +23,10 @@ import timber.log.Timber
 
 class BatchScanViewModel constructor(
     private val context: Context,
-    private val hsmDecoderManager: HSMDecoderManager,
     private val httpApi: HttpApi
 ) : ViewModel(), DecodeResultListener {
+
+    private val hsmDecoderManager = HSMDecoderManager(context)
 
     private val compDisposable = CompositeDisposable()
     private val loadingDialog: LoadingDialogFactory = LoadingDialogFactory(context)
@@ -123,7 +124,6 @@ class BatchScanViewModel constructor(
     }
 
     fun onResume() {
-        Timber.tag("HSMD").d(hsmDecoderManager.toString())
         hsmDecoderManager.addResultListener(this)
     }
 

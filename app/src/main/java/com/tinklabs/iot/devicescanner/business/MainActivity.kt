@@ -20,10 +20,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.honeywell.barcode.HSMDecoder
+import com.honeywell.license.ActivationManager
+import com.tinklabs.iot.devicescanner.BuildConfig
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
 import com.tinklabs.iot.devicescanner.ext.toast
-import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
@@ -36,7 +38,6 @@ class MainActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    private val hsmDecoderManager: HSMDecoderManager by inject()
     private val mainViewModel by viewModel<MainViewModel>()
     private var granted: Boolean = false
 
@@ -49,6 +50,8 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        ActivationManager.activate(this, BuildConfig.SWIFT_DECODER_LICENSE)
 
         navController = Navigation.findNavController(this, R.id.nav_fragment)
         appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -94,7 +97,6 @@ class MainActivity : BaseActivity() {
 
     private fun initIfPermissionGranted() {
         granted = true
-        hsmDecoderManager.init()
     }
 
     private fun exitIfPermissionDenied() {
@@ -127,7 +129,7 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (granted) {
-            hsmDecoderManager.release()
+            HSMDecoder.disposeInstance()
         }
     }
 
