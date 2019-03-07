@@ -1,6 +1,7 @@
 package com.tinklabs.iot.devicescanner.business.index
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.core.os.bundleOf
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.business.MainViewModel
+import com.tinklabs.iot.devicescanner.business.batchscan.BatchScanActivity
 import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_COMPLETE
 import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_EMPTY
 import com.tinklabs.iot.devicescanner.business.index.IndexViewModel.Companion.STATUS_ERROR
@@ -90,7 +92,10 @@ class IndexFragment : Fragment() {
      * navigate to fragment
      */
     private fun navigateTo(status: String) {
-        findNavController().navigate(R.id.action_to_batch_scan, bundleOf(STATUS_BUNDLE_KEY to status))
+        //findNavController().navigate(R.id.action_to_batch_scan, bundleOf(STATUS_BUNDLE_KEY to status))
+        val intent = Intent(context!!, BatchScanActivity::class.java)
+        intent.putExtra(STATUS_BUNDLE_KEY, status)
+        startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {

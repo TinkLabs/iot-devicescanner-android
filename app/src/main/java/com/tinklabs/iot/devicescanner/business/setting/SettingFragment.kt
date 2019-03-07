@@ -11,7 +11,6 @@ import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.ext.toast
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 class SettingFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -20,7 +19,7 @@ class SettingFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         private val CC = arrayOf("kurt.huang@tinklabs.com")
     }
 
-    private val hsmDecoderManager: HSMDecoderManager by inject { parametersOf(context!!) }
+    private val hsmDecoderManager: HSMDecoderManager by inject()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.setting, rootKey)

@@ -9,6 +9,7 @@ import com.honeywell.license.ActivationManager
 import com.honeywell.plugins.decode.DecodeResultListener
 import com.tinklabs.iot.devicescanner.BuildConfig
 import com.tinklabs.iot.devicescanner.R
+import timber.log.Timber
 
 class HSMDecoderManager constructor(private val context: Context) {
     private lateinit var hsmDecoder: HSMDecoder
@@ -38,6 +39,7 @@ class HSMDecoderManager constructor(private val context: Context) {
     }
 
     fun addResultListener(listener: DecodeResultListener) {
+        Timber.tag("HSMD").d(hsmDecoder.toString())
         hsmDecoder.addResultListener(listener)
     }
 

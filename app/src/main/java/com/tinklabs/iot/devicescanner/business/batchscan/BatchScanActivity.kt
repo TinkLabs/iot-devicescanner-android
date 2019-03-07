@@ -1,10 +1,8 @@
 package com.tinklabs.iot.devicescanner.business.batchscan
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,37 +10,43 @@ import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.business.batchscan.adapter.ScanItemAdapter
 import com.tinklabs.iot.devicescanner.business.index.IndexFragment
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
-import kotlinx.android.synthetic.main.fragment_batch_scan.*
+import kotlinx.android.synthetic.main.activity_batch_scan.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
-class BatchScanFragment : Fragment() {
-    companion object {
-        const val IMEI_LENGTH = 15
-    }
+class BatchScanActivity : AppCompatActivity() {
+
     private lateinit var status: String
-    private val viewModel by viewModel<BatchScanViewModel>{ parametersOf(context)}
+    private val viewModel by viewModel<BatchScanViewModel> { parametersOf(this) }
 
     private val mAdapter = ScanItemAdapter()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_batch_scan, container, false)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_batch_scan)
+
+        status = intent.getStringExtra(IndexFragment.STATUS_BUNDLE_KEY)
+        initView()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        status = arguments?.getString(IndexFragment.STATUS_BUNDLE_KEY) ?: ""
+    override fun onStart() {
+        super.onStart()
+        viewModel.onResume()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onStop() {
+        super.onStop()
+        viewModel.onPause()
+    }
+
+    private fun initView() {
+        toolbar.setNavigationOnClickListener { this.finish() }
 
         mAdapter.setRemoveClickListener {
             viewModel.removeItem(it)
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(context).apply { orientation = RecyclerView.VERTICAL }
+        recyclerView.layoutManager = LinearLayoutManager(this).apply { orientation = RecyclerView.VERTICAL }
         recyclerView.adapter = mAdapter
 
         viewModel.items.observe(this, Observer {
@@ -64,13 +68,12 @@ class BatchScanFragment : Fragment() {
 
         fab.setOnClickListener {
             decodeComponent.enableScanning(false)
-            ConfirmDialog(context!!)
+            ConfirmDialog(this)
                 .cancelable(false)
                 .title(R.string.tips)
                 .content("Confirm to upload these information?")
                 .confirmText(R.string.upload)
                 .onConfirm(View.OnClickListener {
-                    Timber.d(status) // debug log
                     viewModel.upload(status) {
                         decodeComponent.enableScanning(true)
                     }
@@ -82,18 +85,8 @@ class BatchScanFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.onPause()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         viewModel.onDestroyView()
     }
 }

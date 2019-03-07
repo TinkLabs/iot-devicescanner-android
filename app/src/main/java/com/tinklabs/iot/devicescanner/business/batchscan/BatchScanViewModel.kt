@@ -78,7 +78,7 @@ class BatchScanViewModel constructor(
 
     }
 
-    fun upload(status: String) {
+    fun upload(status: String, onSuccess: () -> Unit) {
         val uploads = mutableListOf<UploadModel>()
         _items.value?.forEach {
             uploads.add(it.transform(status = status))
@@ -106,6 +106,7 @@ class BatchScanViewModel constructor(
                             context.toast("Upload successful!!!")
                             loadItems()
                             resetValue()
+                            onSuccess()
                         } else {
                             // upload failed tips error message
                             context.toast("Upload failed!!!")
@@ -122,6 +123,7 @@ class BatchScanViewModel constructor(
     }
 
     fun onResume() {
+        Timber.tag("HSMD").d(hsmDecoderManager.toString())
         hsmDecoderManager.addResultListener(this)
     }
 

@@ -20,7 +20,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.honeywell.barcode.HSMDecoder
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
 import com.tinklabs.iot.devicescanner.ext.toast
@@ -29,7 +28,6 @@ import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -38,7 +36,7 @@ class MainActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    private val hsmDecoderManager: HSMDecoderManager by inject { parametersOf(this)}
+    private val hsmDecoderManager: HSMDecoderManager by inject()
     private val mainViewModel by viewModel<MainViewModel>()
     private var granted: Boolean = false
 
