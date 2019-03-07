@@ -5,20 +5,18 @@ import android.graphics.Color
 import androidx.preference.PreferenceManager
 import com.honeywell.barcode.HSMDecoder
 import com.honeywell.barcode.Symbology
-import com.honeywell.license.ActivationManager
 import com.honeywell.plugins.decode.DecodeResultListener
-import com.tinklabs.iot.devicescanner.BuildConfig
 import com.tinklabs.iot.devicescanner.R
 
 class HSMDecoderManager constructor(private val context: Context) {
-    private lateinit var hsmDecoder: HSMDecoder
+    private val hsmDecoder: HSMDecoder = HSMDecoder.getInstance(context)
 
-    fun init() {
-        ActivationManager.activate(context, BuildConfig.SWIFT_DECODER_LICENSE)
-
-        hsmDecoder = HSMDecoder.getInstance(context)
-
+    init {
         //set all decoder related settings
+        reset()
+    }
+
+    fun reset() {
         resetUPCA()
         resetCODE128()
         resetCODE39()
@@ -31,10 +29,6 @@ class HSMDecoderManager constructor(private val context: Context) {
         hsmDecoder.setAimerColor(Color.GREEN)
         hsmDecoder.setOverlayText(context.getString(R.string.scan_component_tip))
         hsmDecoder.setOverlayTextColor(Color.RED)
-    }
-
-    fun release() {
-        HSMDecoder.disposeInstance()
     }
 
     fun addResultListener(listener: DecodeResultListener) {

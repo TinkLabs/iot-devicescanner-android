@@ -17,12 +17,15 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.honeywell.barcode.HSMDecoder
+import com.honeywell.license.ActivationManager
+import com.tinklabs.iot.devicescanner.BuildConfig
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
 import com.tinklabs.iot.devicescanner.ext.toast
-import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
@@ -35,7 +38,6 @@ class MainActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    private val hsmDecoderManager: HSMDecoderManager by inject()
     private val mainViewModel by viewModel<MainViewModel>()
     private var granted: Boolean = false
 
@@ -48,6 +50,8 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        ActivationManager.activate(this, BuildConfig.SWIFT_DECODER_LICENSE)
 
         navController = Navigation.findNavController(this, R.id.nav_fragment)
         appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -93,7 +97,6 @@ class MainActivity : BaseActivity() {
 
     private fun initIfPermissionGranted() {
         granted = true
-        hsmDecoderManager.init()
     }
 
     private fun exitIfPermissionDenied() {
@@ -126,7 +129,7 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (granted) {
-            hsmDecoderManager.release()
+            HSMDecoder.disposeInstance()
         }
     }
 
@@ -138,9 +141,13 @@ class MainActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (REQUEST_CODE == requestCode) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            Timber.d("Code: ${result.status.statusCode}, Message: ${result.status.statusMessage}")
             if (result.isSuccess) handleSignInResult(result.signInAccount!!)
             else {
+                /**
+                 * sign in progress will call here. and result is null,
+                 * so return then sign in success will call {@link #onActivityResult()} again.
+                 */
+                if (result.status.statusCode == GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS) return
                 toast("sign in failed")
                 this.finish()
             }

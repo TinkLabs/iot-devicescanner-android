@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.honeywell.barcode.HSMDecodeResult
 import com.honeywell.plugins.decode.DecodeResultListener
-import com.tinklabs.iot.devicescanner.business.singlescan.SingleScanViewModel
+import com.tinklabs.iot.devicescanner.business.batchscan.BatchScanFragment.Companion.IMEI_LENGTH
 import com.tinklabs.iot.devicescanner.data.DeviceInfo
 import com.tinklabs.iot.devicescanner.data.remote.HttpResponse
 import com.tinklabs.iot.devicescanner.data.remote.UploadModel
@@ -23,12 +23,13 @@ import timber.log.Timber
 
 class BatchScanViewModel constructor(
     private val context: Context,
-    private val hsmDecoderManager: HSMDecoderManager,
     private val httpApi: HttpApi
 ) : ViewModel(), DecodeResultListener {
 
+    private val hsmDecoderManager = HSMDecoderManager(context)
+
     private val compDisposable = CompositeDisposable()
-    private var loadingDialog: LoadingDialogFactory = LoadingDialogFactory(context)
+    private val loadingDialog: LoadingDialogFactory = LoadingDialogFactory(context)
 
     private val _deviceInfo = MutableLiveData<DeviceInfo>()
     val deviceInfo: LiveData<DeviceInfo>
@@ -78,7 +79,7 @@ class BatchScanViewModel constructor(
 
     }
 
-    fun upload(status: String) {
+    fun upload(status: String, onSuccess: () -> Unit) {
         val uploads = mutableListOf<UploadModel>()
         _items.value?.forEach {
             uploads.add(it.transform(status = status))
@@ -106,6 +107,7 @@ class BatchScanViewModel constructor(
                             context.toast("Upload successful!!!")
                             loadItems()
                             resetValue()
+                            onSuccess()
                         } else {
                             // upload failed tips error message
                             context.toast("Upload failed!!!")
@@ -139,14 +141,14 @@ class BatchScanViewModel constructor(
             if (results.size < 2) return
 
             val barcodeData0 = results[0].barcodeData
-            if (barcodeData0.length == SingleScanViewModel.IMEI_LENGTH) {
+            if (barcodeData0.length == IMEI_LENGTH) {
                 _deviceInfo.value?.imei = barcodeData0
             } else {
                 _deviceInfo.value?.snCode = barcodeData0
             }
 
             val barcodeData1 = results[1].barcodeData
-            if (barcodeData1.length == SingleScanViewModel.IMEI_LENGTH) {
+            if (barcodeData1.length == IMEI_LENGTH) {
                 _deviceInfo.value?.imei = barcodeData1
             } else {
                 _deviceInfo.value?.snCode = barcodeData1

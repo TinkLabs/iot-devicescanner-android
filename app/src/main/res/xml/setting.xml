@@ -48,10 +48,10 @@
                 app:title="Send feedback"
                 app:summary="Report technical issues or suggest new features"/>
 
-        <Preference
+        <!--<Preference
                 app:key="@string/sp_key_about"
                 app:title="About"
-                app:summary=""/>
+                app:summary=""/>-->
 
         <Preference
                 app:key="@string/sp_key_logout"
