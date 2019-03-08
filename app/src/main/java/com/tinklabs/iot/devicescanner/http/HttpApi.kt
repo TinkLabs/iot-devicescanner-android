@@ -11,7 +11,7 @@ import retrofit2.http.Url
 
 interface HttpApi {
     @POST("barcode")
-    fun uploadDeviceInfo(@Body body: List<UploadModel>): Observable<HttpResponse>
+    fun uploadDeviceInfo(@Body body: UploadModel): Observable<HttpResponse>
 
     @GET("")
     fun getStates(@Url url: String): Observable<StateResponse>

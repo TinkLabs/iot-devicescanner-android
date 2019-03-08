@@ -8,6 +8,7 @@ import com.tinklabs.iot.devicescanner.business.index.IndexViewModel
 import com.tinklabs.iot.devicescanner.db.AppDataBase
 import com.tinklabs.iot.devicescanner.http.BaseApiClient
 import com.tinklabs.iot.devicescanner.http.HttpApi
+import com.tinklabs.iot.devicescanner.utils.EmailAccountManager
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -27,6 +28,10 @@ val appModule: Module = module {
 
     viewModel {
         MainViewModel()
+    }
+
+    factory {
+        EmailAccountManager(androidContext())
     }
 
     factory {

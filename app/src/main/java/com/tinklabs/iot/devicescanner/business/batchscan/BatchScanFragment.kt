@@ -71,8 +71,9 @@ class BatchScanFragment : Fragment() {
                 .confirmText(R.string.upload)
                 .onConfirm(View.OnClickListener {
                     Timber.d(status) // debug log
+                    decodeComponent.enableScanning(true)
                     viewModel.upload(status) {
-                        decodeComponent.enableScanning(true)
+                        // upload success call back finish or do another thing
                     }
                 })
                 .onCancel(View.OnClickListener {
