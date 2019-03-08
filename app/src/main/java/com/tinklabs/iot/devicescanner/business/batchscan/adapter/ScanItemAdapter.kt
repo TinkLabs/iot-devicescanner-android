@@ -27,7 +27,7 @@ class ScanItemAdapter: RecyclerView.Adapter<ScanItemAdapter.ScanItemViewHolder>(
         holder.data = items[position]
         holder.itemView.removeIcon.setOnClickListener {
             holder.data?.let {
-                it -> onRemove(it)
+                onRemove(it)
             }
         }
     }

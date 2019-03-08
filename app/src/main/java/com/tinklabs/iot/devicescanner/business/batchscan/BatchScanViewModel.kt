@@ -13,6 +13,7 @@ import com.tinklabs.iot.devicescanner.data.remote.UploadModel
 import com.tinklabs.iot.devicescanner.ext.toast
 import com.tinklabs.iot.devicescanner.ext.transform
 import com.tinklabs.iot.devicescanner.http.HttpApi
+import com.tinklabs.iot.devicescanner.utils.EmailAccountManager
 import com.tinklabs.iot.devicescanner.utils.HSMDecoderManager
 import com.tinklabs.iot.devicescanner.widget.LoadingDialogFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,6 +28,7 @@ class BatchScanViewModel constructor(
 ) : ViewModel(), DecodeResultListener {
 
     private val hsmDecoderManager = HSMDecoderManager(context)
+    private val accountManager = EmailAccountManager(context)
 
     private val compDisposable = CompositeDisposable()
     private val loadingDialog: LoadingDialogFactory = LoadingDialogFactory(context)
@@ -80,12 +82,13 @@ class BatchScanViewModel constructor(
     }
 
     fun upload(status: String, onSuccess: () -> Unit) {
-        val uploads = mutableListOf<UploadModel>()
+        val barcodes = mutableListOf<UploadModel.BarCode>()
         _items.value?.forEach {
-            uploads.add(it.transform(status = status))
+            barcodes.add(it.transform(status = status))
         }
+        val account = accountManager.account
         compDisposable.add(
-            httpApi.uploadDeviceInfo(uploads)
+            httpApi.uploadDeviceInfo(UploadModel(account = account, barcodes = barcodes))
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableObserver<HttpResponse>() {
 

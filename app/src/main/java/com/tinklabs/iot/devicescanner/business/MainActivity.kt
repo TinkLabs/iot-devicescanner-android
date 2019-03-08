@@ -26,6 +26,7 @@ import com.tinklabs.iot.devicescanner.BuildConfig
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.app.base.BaseActivity
 import com.tinklabs.iot.devicescanner.ext.toast
+import com.tinklabs.iot.devicescanner.utils.EmailAccountManager
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
@@ -39,6 +40,8 @@ class MainActivity : BaseActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private val mainViewModel by viewModel<MainViewModel>()
+    private val accountManager:EmailAccountManager by inject()
+
     private var granted: Boolean = false
 
     companion object {
@@ -147,8 +150,14 @@ class MainActivity : BaseActivity() {
                  * sign in progress will call here. and result is null,
                  * so return then sign in success will call {@link #onActivityResult()} again.
                  */
-                if (result.status.statusCode == GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS) return
-                toast("sign in failed")
+                when(result.status.statusCode) {
+                    GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS -> return
+                    GoogleSignInStatusCodes.NETWORK_ERROR -> toast("network error")
+                    GoogleSignInStatusCodes.SIGN_IN_REQUIRED -> return
+                    GoogleSignInStatusCodes.TIMEOUT -> toast("sign in time out")
+                    GoogleSignInStatusCodes.SIGN_IN_CANCELLED -> toast("sign in is canceled")
+                    else -> toast("sign in failed")
+                }
                 this.finish()
             }
         }
@@ -158,16 +167,16 @@ class MainActivity : BaseActivity() {
         // Signed in successfully, show authenticated UI.
         mainViewModel.setSignInStatus(true)
         checkPermission()
-        Timber.d(account.email)
+        accountManager.account = account.email ?: ""
     }
 
     override fun onStart() {
         super.onStart()
         val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
-        Timber.d(account?.email)
         // if account not null, skip sign in check
         if (null != account && account.email?.isNotEmpty() == true) {
             checkPermission()
+            accountManager.account = account.email ?: ""
             mainViewModel.setSignInStatus(true)
         } else {
             mainViewModel.setSignInStatus(false)
