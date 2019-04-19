@@ -1,9 +1,8 @@
 package com.tinklabs.iot.devicescanner.business.batchscan
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tinklabs.iot.devicescanner.R
 import com.tinklabs.iot.devicescanner.business.batchscan.adapter.ScanItemAdapter
 import com.tinklabs.iot.devicescanner.business.index.IndexFragment
+import com.tinklabs.iot.devicescanner.ext.snack
+import com.tinklabs.iot.devicescanner.utils.DragViewUtil
 import com.tinklabs.iot.devicescanner.widget.ConfirmDialog
 import kotlinx.android.synthetic.main.fragment_batch_scan.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -21,8 +22,9 @@ class BatchScanFragment : Fragment() {
     companion object {
         const val IMEI_LENGTH = 15
     }
+
     private lateinit var status: String
-    private val viewModel by viewModel<BatchScanViewModel>{ parametersOf(context)}
+    private val viewModel by viewModel<BatchScanViewModel> { parametersOf(context) }
 
     private val mAdapter = ScanItemAdapter()
 
@@ -47,39 +49,50 @@ class BatchScanFragment : Fragment() {
 
         viewModel.items.observe(this, Observer {
             mAdapter.items = it
-            fab.isEnabled = it.size != 0
+            setHasOptionsMenu(it.size != 0)
             textView_label.text = getString(R.string.scan_result_batch_message, viewModel.items.value?.size)
         })
         viewModel.valid.observe(this, Observer {
             if (!it) {
-                scan_result.text =
+                textView_label.snack(
                     "Not valid scan result: \n ${viewModel.deviceInfo.value?.imei}\n${viewModel.deviceInfo.value?.snCode}"
+                ) {}
                 /*Answers.getInstance()
                     .logCustom(CustomEvent("Scan")
                         .putCustomAttribute("VALID", "NO"))*/
-            } else {
-                scan_result.text = ""
             }
         })
 
-        fab.setOnClickListener {
-            decodeComponent.enableScanning(false)
-            ConfirmDialog(context!!)
-                .cancelable(false)
-                .title(R.string.tips)
-                .content("Confirm to upload these information?")
-                .confirmText(R.string.upload)
-                .onConfirm(View.OnClickListener {
-                    Timber.d(status) // debug log
-                    decodeComponent.enableScanning(true)
-                    viewModel.upload(status) {
-                        // upload success call back finish or do another thing
-                    }
-                })
-                .onCancel(View.OnClickListener {
-                    decodeComponent.enableScanning(true)
-                })
-                .show()
+        DragViewUtil.drag<ConstraintLayout.LayoutParams>(decodeComponent, rootView)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.upload, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_upload -> {
+                decodeComponent.enableScanning(false)
+                ConfirmDialog(context!!)
+                    .cancelable(false)
+                    .title(R.string.tips)
+                    .content("Confirm to upload these information?")
+                    .confirmText(R.string.upload)
+                    .onConfirm(View.OnClickListener {
+                        Timber.d(status) // debug log
+                        decodeComponent.enableScanning(true)
+                        viewModel.upload(status) {
+                            // upload success call back finish or do another thing
+                        }
+                    })
+                    .onCancel(View.OnClickListener {
+                        decodeComponent.enableScanning(true)
+                    })
+                    .show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
