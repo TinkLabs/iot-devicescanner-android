@@ -14,6 +14,6 @@ data class StatusItem(
     }
 
     override fun toString(): String {
-        return "{UID: ${uid}, STATUS: ${status}}"
+        return "{UID: $uid, STATUS: $status}"
     }
 }
